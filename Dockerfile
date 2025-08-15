@@ -1,7 +1,7 @@
 FROM codercom/code-server:latest
 
 USER root
-# 安装依赖
+# 安装你需要的工具
 RUN apt update && apt install -y build-essential nano curl \
     && rm -rf /var/lib/apt/lists/*
 
@@ -23,7 +23,7 @@ RUN PATH+=":$HOME/n/bin" && \
 RUN git config --global credential.helper cache && git config --global core.editor "nano"
 
 USER root
-# 修权限 + 启动的入口脚本
+# 修权限并回到 coder 用户启动的脚本
 RUN printf '#!/bin/bash\n\
 set -e\n\
 echo "[fix] Checking /home/coder permissions..."\n\
@@ -32,7 +32,8 @@ if [ "$(stat -c "%u" /home/coder)" != "1000" ]; then\n\
   chown -R coder:coder /home/coder\n\
 fi\n\
 echo "[fix] Starting code-server as coder..."\n\
-exec sudo -E -u coder /usr/bin/entrypoint.sh "$@"\n' \
+export HOME=/home/coder\n\
+exec sudo -u coder env HOME=/home/coder /usr/bin/entrypoint.sh "$@"\n' \
 > /usr/local/bin/fix-perms-entrypoint.sh \
     && chmod +x /usr/local/bin/fix-perms-entrypoint.sh
 
