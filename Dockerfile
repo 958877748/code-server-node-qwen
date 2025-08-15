@@ -17,7 +17,7 @@ ENV LANGUAGE C.UTF-8
 RUN mkdir -p /root/.config/code-server && \
     echo "bind-addr: 0.0.0.0:8080\n\
 auth: password\n\
-password: myStrongPass123!\n\
+password: ${PASSWORD}\n\
 cert: false" > /root/.config/code-server/config.yaml
 
 # 暴露端口
