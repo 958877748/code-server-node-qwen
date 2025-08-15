@@ -1,6 +1,5 @@
-FROM codercom/code-server:latest
 
-RUN sudo chmod -R 777 /home/coder
+FROM codercom/code-server:latest
 
 RUN sudo apt update
 RUN sudo apt install -y build-essential nano
@@ -21,3 +20,5 @@ RUN PATH+=":$HOME/n/bin" && \
 
 # Cache your git password for 15 minutes, so you don't have to enter it for every push
 RUN git config --global credential.helper cache && git config --global core.editor "nano"
+
+RUN sudo chmod -R 777 /home/coder
