@@ -3,7 +3,11 @@ FROM codercom/code-server:latest
 
 RUN echo "Dockerfile   ===========>   start   set /home/coder/data to coder"
 USER root
-RUN chown -R coder:coder /home/coder/data
+
+# 使用 mkdir -p 创建目录，如果目录已存在也不会报错
+# 然后用 && 连接 chown 命令，确保创建成功后再修改所有权
+RUN mkdir -p /home/coder/data && chown -R coder:coder /home/coder/data
+
 USER coder
 RUN echo "Dockerfile   ===========>   end"
 
