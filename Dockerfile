@@ -1,16 +1,17 @@
 
 FROM codercom/code-server:latest
 
-RUN echo "Dockerfile   ===========>   start"
+RUN echo "Dockerfile   ===========>   start   set /home/coder/data to coder"
 USER root
-RUN chown -R coder:coder /home/coder
+RUN chown -R coder:coder /home/coder/data
 USER coder
+RUN echo "Dockerfile   ===========>   end"
 
 RUN sudo apt update
 RUN sudo apt install -y build-essential nano
 
 # Install "n", the node.js version manager
-RUN curl -L https://git.io/n-install | bash -s -- -y lts latest
+RUN curl -L https://git.io/n-install | bash -s -- -y lts
 
 # This is needed for the PATH line to work
 SHELL ["/bin/bash", "-c"]
