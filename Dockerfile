@@ -18,11 +18,15 @@ RUN PATH+=":$HOME/n/bin" && \
 RUN git config --global credential.helper cache && git config --global core.editor "nano"
 
 USER root
-RUN echo '#!/bin/bash\n\
-echo "[fix] checking /home/coder permissions..."\n\
-chown -R coder:coder /home/coder\n\
-exec /usr/bin/entrypoint.sh "$@"' \
+RUN printf '#!/bin/bash\nset -e\n\
+echo "[fix] Checking /home/coder permissions..."\n\
+if [ "$(stat -c "%u" /home/coder)" != "1000" ]; then\n\
+  echo "[fix] Fixing permissions for /home/coder..."\n\
+  chown -R coder:coder /home/coder\n\
+fi\n\
+exec /usr/bin/entrypoint.sh "$@"\n' \
 > /usr/local/bin/fix-perms-entrypoint.sh \
-    && chmod +x /usr/local/bin/fix-perms-entrypoint.sh
+    && chmod +x /usr/local/bin/fix-perms-entrypoint.sh \
+    && ls -l /usr/local/bin/fix-perms-entrypoint.sh
 
 ENTRYPOINT ["/usr/local/bin/fix-perms-entrypoint.sh"]
