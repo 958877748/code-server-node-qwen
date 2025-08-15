@@ -1,32 +1,28 @@
 
-FROM codercom/code-server:latest
+FROM mcr.microsoft.com/devcontainers/universal:linux
 
-RUN echo "Dockerfile   ===========>   start   set /home/coder/data to coder"
-USER root
+# 安装 code-server
+RUN curl -fsSL https://code-server.dev/install.sh | sh 
 
-# 使用 mkdir -p 创建目录，如果目录已存在也不会报错
-# 然后用 && 连接 chown 命令，确保创建成功后再修改所有权
-RUN mkdir -p /home/coder/data && chown -R coder:coder /home/coder/data
+# 安装 ssh 服务、git、wget 等工具
+RUN apt-get update && apt-get install -y git wget unzip
 
-USER coder
-RUN echo "Dockerfile   ===========>   end"
+# 安装 Qwen-code 依赖（如果不需要可以删掉）
+RUN npm install -g @qwen-code/qwen-code@latest
 
-RUN sudo apt update
-RUN sudo apt install -y build-essential nano
+# 设置语言环境，命令行支持中文
+ENV LANG C.UTF-8
+ENV LANGUAGE C.UTF-8
 
-# Install "n", the node.js version manager
-RUN curl -L https://git.io/n-install | bash -s -- -y lts
+# 创建 code-server 配置文件（root 用户的配置路径）
+RUN mkdir -p /root/.config/code-server && \
+    echo "bind-addr: 0.0.0.0:8080\n\
+auth: password\n\
+password: myStrongPass123!\n\
+cert: false" > /root/.config/code-server/config.yaml
 
-# This is needed for the PATH line to work
-SHELL ["/bin/bash", "-c"]
+# 暴露 code-server 访问端口
+EXPOSE 8080
 
-# Install yarn, which is an alternative to npm
-RUN PATH+=":$HOME/n/bin" && \
-    curl -o- -L https://yarnpkg.com/install.sh | bash
-
-# Install qwen-code globally
-RUN PATH+=":$HOME/n/bin" && \
-    npm install -g @qwen-code/qwen-code@latest
-
-# Cache your git password for 15 minutes, so you don't have to enter it for every push
-RUN git config --global credential.helper cache && git config --global core.editor "nano"
+# 容器启动时执行 code-server（root + --allow-root）
+CMD ["code-server", "--bind-addr", "0.0.0.0:8080", "--allow-root"]
