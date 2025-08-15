@@ -1,35 +1,23 @@
 FROM codercom/code-server:latest
 
-USER root
-RUN apt update && apt install -y build-essential nano curl \
-    && rm -rf /var/lib/apt/lists/*
+RUN sudo chmod -R 777 /home/coder
 
-USER coder
+RUN sudo apt update
+RUN sudo apt install -y build-essential nano
+
+# Install "n", the node.js version manager
 RUN curl -L https://git.io/n-install | bash -s -- -y lts latest
 
+# This is needed for the PATH line to work
 SHELL ["/bin/bash", "-c"]
+
+# Install yarn, which is an alternative to npm
 RUN PATH+=":$HOME/n/bin" && \
     curl -o- -L https://yarnpkg.com/install.sh | bash
 
+# Install qwen-code globally
 RUN PATH+=":$HOME/n/bin" && \
     npm install -g @qwen-code/qwen-code@latest
 
+# Cache your git password for 15 minutes, so you don't have to enter it for every push
 RUN git config --global credential.helper cache && git config --global core.editor "nano"
-
-USER root
-# 直接生成一个新 entrypoint 脚本
-RUN cat <<'EOF' > /usr/bin/entrypoint-with-fix.sh
-#!/usr/bin/bash
-set -e
-# 修复权限
-if [ "$(stat -c "%u" /home/coder)" != "1000" ]; then
-  echo "[fix] Fixing permissions for /home/coder..."
-  chown -R coder:coder /home/coder
-fi
-# 调用原始入口逻辑
-exec /usr/bin/entrypoint.sh "$@"
-EOF
-
-RUN chmod +x /usr/bin/entrypoint-with-fix.sh
-
-ENTRYPOINT ["/usr/bin/entrypoint-with-fix.sh"]
