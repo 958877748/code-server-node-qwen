@@ -1,7 +1,11 @@
 
 FROM codercom/code-server:latest
 
-RUN sudo chmod -R 777 /home/coder
+RUN echo "Dockerfile   ===========>   start"
+USER root
+RUN chown -R coder:coder /home/coder
+USER coder
+
 RUN sudo apt update
 RUN sudo apt install -y build-essential nano
 
