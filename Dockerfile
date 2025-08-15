@@ -13,5 +13,9 @@ SHELL ["/bin/bash", "-c"]
 RUN PATH+=":$HOME/n/bin" && \
     curl -o- -L https://yarnpkg.com/install.sh | bash
 
+# Install qwen-code globally
+RUN PATH+=":$HOME/n/bin" && \
+    npm install -g @qwen-code/qwen-code@latest
+
 # Cache your git password for 15 minutes, so you don't have to enter it for every push
 RUN git config --global credential.helper cache && git config --global core.editor "nano"
