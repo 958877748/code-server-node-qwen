@@ -8,13 +8,13 @@ RUN apt-get update && apt-get install -y git wget unzip
 
 
 # 安装 Claude Code
-RUN npm install -g @anthropic-ai/claude-code
+# RUN npm install -g @anthropic-ai/claude-code
 
 # 安装 Claude Code Router
-RUN npm install -g @musistudio/claude-code-router
+# RUN npm install -g @musistudio/claude-code-router
 
 # 安装 Qwen-code
-# RUN npm install -g @qwen-code/qwen-code@latest
+RUN npm install -g @qwen-code/qwen-code@latest
 
 # 设置语言环境
 ENV LANG C.UTF-8
@@ -32,4 +32,4 @@ EXPOSE 8080
 EXPOSE 9000
 
 # 启动 code-server（现在不用 --allow-root）
-CMD ["code-server", "--bind-addr", "0.0.0.0:8080"]
+CMD ["code-server", "--bind-addr", "0.0.0.0:8080", "/data"]
