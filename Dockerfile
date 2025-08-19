@@ -1,7 +1,7 @@
 FROM mcr.microsoft.com/devcontainers/universal:linux
 
 # 安装 code-server 和插件 cline
-RUN curl -fsSL https://code-server.dev/install.sh | sh 
+RUN curl -fsSL https://code-server.dev/install.sh | sh \
   && code-server --install-extension saoudrizwan.claude-dev \
   && echo done
 
