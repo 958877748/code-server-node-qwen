@@ -1,7 +1,10 @@
 FROM mcr.microsoft.com/devcontainers/universal:linux
 
 # 安装 code-server 和插件 cline
-RUN curl -fsSL https://code-server.dev/install.sh | sh
+RUN curl -fsSL https://code-server.dev/install.sh | sh \
+  && code-server --install-extension saoudrizwan.claude-dev \
+  && code-server --install-extension ms-ceintl.vscode-language-pack-zh-hans \
+  && echo done
 
 # 安装常用工具
 RUN apt-get update && apt-get install -y git wget unzip
@@ -14,7 +17,7 @@ RUN apt-get update && apt-get install -y git wget unzip
 # RUN npm install -g @musistudio/claude-code-router
 
 # 安装 Qwen-code
-RUN npm install -g @qwen-code/qwen-code@latest
+# RUN npm install -g @qwen-code/qwen-code@latest/
 
 # 设置语言环境
 ENV LANG C.UTF-8
