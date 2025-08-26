@@ -15,4 +15,4 @@ ENV SHELL=/bin/zsh
 EXPOSE 7681 8000
 
 # 启动 ttyd
-CMD ["ttyd", "-p", "7681", "--writable", "zsh"]
+CMD ["ttyd", "-p", "7681", "-c", "$TTYD_PWD", "--writable", "zsh"]
