@@ -1,19 +1,18 @@
-FROM node:20.17.0-alpine
+FROM mcr.microsoft.com/devcontainers/universal:linux
 
-# 安装 zsh、curl、git 和 ttyd
-RUN apk add --no-cache zsh curl git ttyd
+# 安装 ttyd 等工具（镜像里已有 zsh、curl、git）
+RUN sudo apt-get update && \
+    sudo apt-get install -y --no-install-recommends ttyd && \
+    sudo rm -rf /var/lib/apt/lists/*
 
-# 安装 oh-my-zsh
-RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+# 全局安装 claude-code
+RUN sudo npm install -g @anthropic-ai/claude-code
 
-# 全局安装 @anthropic-ai/claude-code
-RUN npm install -g @anthropic-ai/claude-code
-
-# 设置默认 shell 为 zsh
+# 默认 shell 已经是 zsh，保险起见再声明一次
 ENV SHELL=/bin/zsh
 
-# 暴露 ttyd 默认端口
+# 暴露端口
 EXPOSE 7681 8000
 
-# 启动 ttyd 并运行 zsh（添加 --writable 参数）
+# 启动 ttyd
 CMD ["ttyd", "-p", "7681", "--writable", "zsh"]
