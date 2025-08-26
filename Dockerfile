@@ -1,38 +1,22 @@
 FROM mcr.microsoft.com/devcontainers/universal:linux
 
-# 安装 code-server 和插件 cline
-RUN curl -fsSL https://code-server.dev/install.sh | sh \
-  && code-server --install-extension saoudrizwan.claude-dev \
-  && code-server --install-extension ms-ceintl.vscode-language-pack-zh-hans \
-  && echo done
+# 安装 zsh、curl、git 和 ttyd
+RUN apk add --no-cache zsh curl git ttyd
 
-# 安装常用工具
-RUN apt-get update && apt-get install -y git wget unzip
+# 安装 oh-my-zsh
+RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+
+# 全局安装 @anthropic-ai/claude-code
+RUN npm install -g @anthropic-ai/claude-code
+
+# 设置默认 shell 为 zsh
+ENV SHELL=/bin/zsh
+
+# 暴露 ttyd 默认端口
+EXPOSE 7681
+EXPOSE 8000
+
+# 启动 ttyd 并运行 zsh（添加 --writable 参数）
+CMD ["ttyd", "-p", "7681", "--writable", "zsh"]
 
 
-# 安装 Claude Code
-# RUN npm install -g @anthropic-ai/claude-code
-
-# 安装 Claude Code Router
-# RUN npm install -g @musistudio/claude-code-router
-
-# 安装 Qwen-code
-# RUN npm install -g @qwen-code/qwen-code@latest/
-
-# 设置语言环境
-ENV LANG C.UTF-8
-ENV LANGUAGE C.UTF-8
-
-# 创建 code-server 配置（root 用户路径）
-RUN mkdir -p /root/.config/code-server && \
-    echo "bind-addr: 0.0.0.0:8080\n\
-auth: password\n\
-password: ${PASSWORD}\n\
-cert: false" > /root/.config/code-server/config.yaml
-
-# 暴露端口
-EXPOSE 8080
-EXPOSE 9000
-
-# 启动 code-server（现在不用 --allow-root）
-CMD ["code-server", "--bind-addr", "0.0.0.0:8080", "/data"]
