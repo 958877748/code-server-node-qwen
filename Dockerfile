@@ -1,22 +1,21 @@
 FROM mcr.microsoft.com/devcontainers/universal:linux
 
-# 安装 zsh、curl、git 和 ttyd
-RUN apk add --no-cache zsh curl git ttyd
+# 使用 apt 安装所需软件（非交互模式）
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends zsh curl git ttyd && \
+    rm -rf /var/lib/apt/lists/*
 
-# 安装 oh-my-zsh
+# 安装 oh-my-zsh（非交互模式）
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 
-# 全局安装 @anthropic-ai/claude-code
+# 全局安装 claude-code
 RUN npm install -g @anthropic-ai/claude-code
 
 # 设置默认 shell 为 zsh
 ENV SHELL=/bin/zsh
 
-# 暴露 ttyd 默认端口
-EXPOSE 7681
-EXPOSE 8000
+# 暴露端口
+EXPOSE 7681 8000
 
-# 启动 ttyd 并运行 zsh（添加 --writable 参数）
+# 启动 ttyd 并运行 zsh
 CMD ["ttyd", "-p", "7681", "--writable", "zsh"]
-
-
