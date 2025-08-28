@@ -3,8 +3,8 @@
 const fs = require('fs');
 const path = require('path');
 
-// 要处理的文件路径
-const targetFile = 'claudecodeui/server/claude-cli.js';
+// 要处理的文件路径（相对路径，因为执行时已经在claudecodeui目录中）
+const targetFile = 'server/claude-cli.js';
 
 // 要删除的代码行
 const codeToRemove = "args.push('--model', 'sonnet');";
