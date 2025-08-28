@@ -7,6 +7,8 @@ ENV ANTHROPIC_MODEL=Qwen/Qwen3-Coder-480B-A35B-Instruct
 ENV ANTHROPIC_SMALL_FAST_MODEL=Qwen/Qwen3-Coder-30B-A3B-Instruct
 # ANTHROPIC_AUTH_TOKEN 需要在运行容器时传入
 
+ENV NODE_ENV=production
+
 # 克隆项目
 RUN git clone https://github.com/siteboon/claudecodeui.git
 
@@ -25,7 +27,7 @@ RUN npm ci
 # 构建生产版本
 RUN npm run build
 
-EXPOSE 5173
+EXPOSE 3001 8000
 
-# 启动应用（自动构建并启动server）
-CMD ["npm", "run", "dev"]
+# 启动应用（启动server）
+CMD ["npm", "run", "server"]
