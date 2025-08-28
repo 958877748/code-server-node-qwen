@@ -1,6 +1,6 @@
 FROM mcr.microsoft.com/devcontainers/universal:linux
 
-RUN sudo npm install -g @anthropic-ai/claude-code
+
 
 ENV ANTHROPIC_BASE_URL=https://api-inference.modelscope.cn
 ENV ANTHROPIC_MODEL=Qwen/Qwen3-Coder-480B-A35B-Instruct
@@ -24,6 +24,8 @@ RUN npm ci
 
 # 构建生产版本
 RUN npm run build
+
+RUN sudo npm install -g @anthropic-ai/claude-code
 
 EXPOSE 3001 8000
 
