@@ -1,18 +1,31 @@
 FROM mcr.microsoft.com/devcontainers/universal:linux
 
-# 安装 ttyd 等工具（镜像里已有 zsh、curl、git）
-RUN sudo apt-get update && \
-    sudo apt-get install -y --no-install-recommends ttyd && \
-    sudo rm -rf /var/lib/apt/lists/*
-
-# 全局安装 claude-code
 RUN sudo npm install -g @anthropic-ai/claude-code
 
-# 默认 shell 已经是 zsh，保险起见再声明一次
-ENV SHELL=/bin/zsh
+ENV ANTHROPIC_BASE_URL=https://api-inference.modelscope.cn
+ENV ANTHROPIC_MODEL=Qwen/Qwen3-Coder-480B-A35B-Instruct
+ENV ANTHROPIC_SMALL_FAST_MODEL=Qwen/Qwen3-Coder-30B-A3B-Instruct
+# ANTHROPIC_AUTH_TOKEN 需要在运行容器时传入
 
-# 暴露端口
-EXPOSE 7681 8000
+# 设置工作目录
+WORKDIR /app
 
-# 启动 ttyd
-CMD ["ttyd", "-p", "7681", "--writable", "zsh"]
+# 克隆项目
+RUN git clone https://github.com/siteboon/claudecodeui.git
+
+# 复制删除脚本到容器中
+COPY RemoveSonnetModel.js /tmp/RemoveSonnetModel.js
+
+# 进入项目目录并删除Sonnet模型代码
+RUN cd claudecodeui && node /tmp/RemoveSonnetModel.js
+
+# 安装依赖
+RUN cd claudecodeui && npm ci
+
+# 构建生产版本
+RUN cd claudecodeui && npm run build
+
+EXPOSE 5173
+
+# 启动应用（自动构建并启动server）
+CMD ["npm", "run", "dev"]
